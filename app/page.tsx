@@ -1,16 +1,23 @@
-import Hero from "@/components/hero";
-import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
-import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/utils/supabase/check-env-vars";
+import { createClient } from '@/utils/supabase/server';
+import NotesClient from './NotesClient';
+
+type Note = {
+  id: string;
+  content: string;
+  image_url?: string;
+};
 
 export default async function Home() {
-  return (
-    <>
-      <Hero />
-      <main className="flex-1 flex flex-col gap-6 px-4">
-        <h2 className="font-medium text-xl mb-4">Next steps</h2>
-        {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-      </main>
-    </>
-  );
+  const supabase = await createClient();
+  
+  // Get notes
+  const { data: notes } = (await supabase.from("notes").select("*")) as {
+    data: Note[];
+  };
+
+  // Get auth status
+  const { data: { session } } = await supabase.auth.getSession();
+  const isSignedIn = !!session;
+
+  return <NotesClient notes={notes || []} isSignedIn={isSignedIn} />;
 }
