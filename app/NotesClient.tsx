@@ -148,7 +148,6 @@ const NotesClient: React.FC<NotesClientProps> = ({ notes, isSignedIn = false }) 
                         prompt: "Write a short notice board post, or poem or news article. Only 2 to 3 sentences long.",
                       }),
                     }).then((response) => {
-                      console.log("Response:", response);
                       response.json().then((json) => {
                         setGeneration(json.text);
                         setDescription(json.text);
